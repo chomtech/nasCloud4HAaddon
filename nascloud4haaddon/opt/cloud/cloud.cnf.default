@@ -13,8 +13,9 @@ CLIENT_ID=""
 # Broker WireGuard
 SERVER_URL="https://proxy.haos.app/cgi-bin/wg_endpoint.sh"
 SERVER_IP="proxy.haos.app"
-AUTH_USER="wguser"
-AUTH_PASS="QyFocEw3MzA4NTcqCg=="   # base64 lub plaintext
+# Uzupelnij dane w UI dodatku (opcje cloud_auth_user/cloud_auth_pass)
+AUTH_USER=""
+AUTH_PASS=""   # moze byc base64 lub plaintext
 
 # Zaawansowane: zostaw puste by wykryc automatycznie (172.30.32.1:HA_PORT)
 LOCAL_FORWARD=""

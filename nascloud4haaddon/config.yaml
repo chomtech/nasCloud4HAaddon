@@ -20,8 +20,18 @@ options:
   nasweb_cloud: false
   nasweb_cloud_subdomain: ""
   nasweb_cloud_port: 8123
+  cloud_auth_user: ""
+  cloud_auth_pass: ""
+  cloud_client_id: ""
+  cloud_server_url: ""
+  cloud_server_ip: ""
 
 schema:
   nasweb_cloud: bool
   nasweb_cloud_subdomain: str?
   nasweb_cloud_port: int(1,65535)
+  cloud_auth_user: str?
+  cloud_auth_pass: str?
+  cloud_client_id: str?
+  cloud_server_url: str?
+  cloud_server_ip: str?

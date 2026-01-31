@@ -33,6 +33,11 @@ cfg_int() { # key default_int
 NASWEB_CLOUD="$(cfg_bool nasweb_cloud false)"
 NASWEB_CLOUD_SUBDOMAIN="$(cfg_str nasweb_cloud_subdomain "")"
 NASWEB_CLOUD_PORT="$(cfg_int nasweb_cloud_port 8123)"
+AUTH_USER_OPT="$(cfg_str cloud_auth_user "")"
+AUTH_PASS_OPT="$(cfg_str cloud_auth_pass "")"
+CLIENT_ID_OPT="$(cfg_str cloud_client_id "")"
+SERVER_URL_OPT="$(cfg_str cloud_server_url "")"
+SERVER_IP_OPT="$(cfg_str cloud_server_ip "")"
 
 CLOUD_DIR=/data/config/nasCloud
 CLOUD_CNF="$CLOUD_DIR/cloud.cnf"
@@ -45,9 +50,36 @@ if [ ! -s "$CLOUD_CNF" ] && [ -s "$CLOUD_DEF" ]; then
 fi
 
 if [ -s "$CLOUD_CNF" ]; then
-  sed -i "s/^HA_PORT=.*/HA_PORT=\"$NASWEB_CLOUD_PORT\"/" "$CLOUD_CNF" || true
+  escape_sed() { printf '%s' "$1" | sed 's/[&|]/\\&/g'; }
+  set_kv() {
+    local key="$1" val="$2" esc
+    esc="$(escape_sed "$val")"
+    if grep -q "^${key}=" "$CLOUD_CNF"; then
+      sed -i "s|^${key}=.*|${key}=\"${esc}\"|" "$CLOUD_CNF" || true
+    else
+      printf '%s=\"%s\"\n' "$key" "$val" >>"$CLOUD_CNF"
+    fi
+  }
+  b64_encode() { printf '%s' "$1" | base64 | tr -d '\n'; }
+
+  set_kv "HA_PORT" "$NASWEB_CLOUD_PORT"
   if [ -n "$NASWEB_CLOUD_SUBDOMAIN" ]; then
-    sed -i "s/^SUBD_REQUEST=.*/SUBD_REQUEST=\"$NASWEB_CLOUD_SUBDOMAIN\"/" "$CLOUD_CNF" || true
+    set_kv "SUBD_REQUEST" "$NASWEB_CLOUD_SUBDOMAIN"
+  fi
+  if [ -n "$AUTH_USER_OPT" ]; then
+    set_kv "AUTH_USER" "$AUTH_USER_OPT"
+  fi
+  if [ -n "$AUTH_PASS_OPT" ]; then
+    set_kv "AUTH_PASS" "$(b64_encode "$AUTH_PASS_OPT")"
+  fi
+  if [ -n "$CLIENT_ID_OPT" ]; then
+    set_kv "CLIENT_ID" "$CLIENT_ID_OPT"
+  fi
+  if [ -n "$SERVER_URL_OPT" ]; then
+    set_kv "SERVER_URL" "$SERVER_URL_OPT"
+  fi
+  if [ -n "$SERVER_IP_OPT" ]; then
+    set_kv "SERVER_IP" "$SERVER_IP_OPT"
   fi
 fi
 

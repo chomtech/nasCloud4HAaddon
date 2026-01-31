@@ -11,6 +11,11 @@ Minimal Home Assistant add-on that configures a WireGuard client and publishes y
 - `nasweb_cloud` (bool): enable/disable cloud
 - `nasweb_cloud_subdomain` (string, optional): requested subdomain
 - `nasweb_cloud_port` (int): internal HA HTTP port (default 8123)
+- `cloud_auth_user` (string): broker username
+- `cloud_auth_pass` (string): broker password (stored as base64 in `cloud.cnf`)
+- `cloud_client_id` (string): required client identifier
+- `cloud_server_url` (string, optional): override broker URL
+- `cloud_server_ip` (string, optional): override broker hostname/IP
 
 ## Required config
 File: `/data/config/nasCloud/cloud.cnf`
@@ -20,4 +25,5 @@ File: `/data/config/nasCloud/cloud.cnf`
 ## Notes
 - Add-on needs `NET_ADMIN` and `/dev/net/tun` for WireGuard.
 - `wireguard-go` is included as a userspace fallback; kernel WireGuard still works when available.
+- The add-on stores `cloud_auth_pass` as base64 in `cloud.cnf`, then `cloud.sh` decodes it before Basic Auth.
 - Logs: `/data/cloud.log`
