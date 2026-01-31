@@ -33,6 +33,8 @@ cfg_int() { # key default_int
 NASWEB_CLOUD="$(cfg_bool nasweb_cloud false)"
 NASWEB_CLOUD_SUBDOMAIN="$(cfg_str nasweb_cloud_subdomain "")"
 NASWEB_CLOUD_PORT="$(cfg_int nasweb_cloud_port 8123)"
+CLOUD_PUBLIC_DOMAIN="$(cfg_str cloud_public_domain "haos.app")"
+CLOUD_HEALTH_INTERVAL="$(cfg_int cloud_health_interval 300)"
 AUTH_USER_OPT="$(cfg_str cloud_auth_user "")"
 AUTH_PASS_OPT="$(cfg_str cloud_auth_pass "")"
 CLIENT_ID_OPT="$(cfg_str cloud_client_id "")"
@@ -86,6 +88,26 @@ fi
 if [ "$NASWEB_CLOUD" = "true" ]; then
   note "Cloud enabled, starting /opt/haos/cloud.sh"
   /opt/haos/cloud.sh || err "cloud.sh failed (see /data/cloud.log)"
+
+  if [ -n "$NASWEB_CLOUD_SUBDOMAIN" ] && [ -n "$CLOUD_PUBLIC_DOMAIN" ]; then
+    if [ "$CLOUD_HEALTH_INTERVAL" -ge 60 ]; then
+      HEALTH_URL="https://${NASWEB_CLOUD_SUBDOMAIN}.${CLOUD_PUBLIC_DOMAIN}"
+      note "Healthcheck enabled: ${HEALTH_URL} every ${CLOUD_HEALTH_INTERVAL}s"
+      (
+        while :; do
+          if ! curl -fsI --max-time 10 "$HEALTH_URL" >/dev/null 2>&1; then
+            err "Healthcheck failed, restarting cloud.sh"
+            /opt/haos/cloud.sh || err "cloud.sh failed (see /data/cloud.log)"
+          fi
+          sleep "$CLOUD_HEALTH_INTERVAL"
+        done
+      ) &
+    else
+      note "Healthcheck disabled (interval < 60)"
+    fi
+  else
+    note "Healthcheck disabled (missing subdomain or public domain)"
+  fi
 else
   note "Cloud disabled, skipping cloud.sh"
 fi

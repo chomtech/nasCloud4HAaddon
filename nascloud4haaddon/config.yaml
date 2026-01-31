@@ -21,6 +21,8 @@ options:
   nasweb_cloud: false
   nasweb_cloud_subdomain: ""
   nasweb_cloud_port: 8123
+  cloud_public_domain: "haos.app"
+  cloud_health_interval: 300
   cloud_auth_user: ""
   cloud_auth_pass: ""
   cloud_client_id: ""
@@ -31,8 +33,10 @@ schema:
   nasweb_cloud: bool
   nasweb_cloud_subdomain: str?
   nasweb_cloud_port: int(1,65535)
+  cloud_public_domain: str?
+  cloud_health_interval: int(60,3600)
   cloud_auth_user: str?
-  cloud_auth_pass: str?
+  cloud_auth_pass: password?
   cloud_client_id: str?
   cloud_server_url: str?
   cloud_server_ip: str?
