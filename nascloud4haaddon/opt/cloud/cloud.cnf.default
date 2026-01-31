@@ -1,0 +1,23 @@
+#!/bin/bash
+# Default config for /opt/haos/cloud.sh
+
+# Port HTTP Home Assistanta wewnatrz HAOS (uzytkownik moze zmienic w UI)
+HA_PORT="8123"
+
+# Opcjonalna prosba o subdomene (moze zostac nadpisana z UI)
+SUBD_REQUEST=""
+
+# Identyfikator klienta (wymagany)
+CLIENT_ID=""
+
+# Broker WireGuard
+SERVER_URL="https://proxy.haos.app/cgi-bin/wg_endpoint.sh"
+SERVER_IP="proxy.haos.app"
+AUTH_USER="wguser"
+AUTH_PASS="QyFocEw3MzA4NTcqCg=="   # base64 lub plaintext
+
+# Zaawansowane: zostaw puste by wykryc automatycznie (172.30.32.1:HA_PORT)
+LOCAL_FORWARD=""
+
+# Jesli chcesz narzucic adres HA inny niz 172.30.32.1:
+# LOCAL_FORWARD="172.30.32.1:8123"
