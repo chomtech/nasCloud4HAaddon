@@ -5,6 +5,7 @@ slug: "nascloud4haaddon"
 init: false
 startup: services
 arch:
+  - amd64
   - aarch64
   - armv7
 

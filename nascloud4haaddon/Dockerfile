@@ -1,4 +1,4 @@
-ARG BUILD_FROM=ghcr.io/home-assistant/aarch64-base:3.18
+ARG BUILD_FROM=ghcr.io/home-assistant/{arch}-base:3.18
 FROM $BUILD_FROM
 
 RUN apk add --no-cache \
