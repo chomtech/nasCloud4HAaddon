@@ -94,8 +94,31 @@ if [ "$NASWEB_CLOUD" = "true" ]; then
       HEALTH_URL="https://${NASWEB_CLOUD_SUBDOMAIN}.${CLOUD_PUBLIC_DOMAIN}"
       note "Healthcheck enabled: ${HEALTH_URL} every ${CLOUD_HEALTH_INTERVAL}s"
       (
+        command -v curl >/dev/null 2>&1 || { err "Healthcheck disabled: curl not found"; exit 0; }
+        # Give DNS/proxy a moment to propagate on startup
+        sleep 30
         while :; do
-          if ! curl -fsI --max-time 10 "$HEALTH_URL" >/dev/null 2>&1; then
+          ok_hc=0
+          attempt=1
+          while [ "$attempt" -le 3 ]; do
+            curl_out="$(curl -sS -o /dev/null -w "%{http_code}" --max-time 10 "$HEALTH_URL" 2>&1)"
+            curl_rc=$?
+            http_code=""
+            curl_err=""
+            if [ "$curl_rc" -eq 0 ]; then
+              http_code="$curl_out"
+            else
+              curl_err="$curl_out"
+            fi
+            if [ -n "$http_code" ] && [ "$http_code" -ge 200 ] && [ "$http_code" -lt 400 ]; then
+              ok_hc=1
+              break
+            fi
+            err "Healthcheck attempt ${attempt}/3 failed (code=${http_code:-na}) ${curl_err:+err=${curl_err}}"
+            attempt=$((attempt+1))
+            sleep 5
+          done
+          if [ "$ok_hc" -ne 1 ]; then
             err "Healthcheck failed, restarting cloud.sh"
             /opt/haos/cloud.sh || err "cloud.sh failed (see /data/cloud.log)"
           fi

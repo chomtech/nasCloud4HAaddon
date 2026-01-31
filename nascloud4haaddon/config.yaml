@@ -1,6 +1,6 @@
 name: "nasCloud4HAaddon"
 description: "WireGuard-based remote access to Home Assistant via haos.app"
-version: "0.1.1"
+version: "0.1.2"
 slug: "nascloud4haaddon"
 init: false
 startup: services
